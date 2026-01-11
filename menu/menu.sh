@@ -1,21 +1,19 @@
 #!/bin/bash
-# =========================================
-# JAY TUNNELING - Main Menu
-# Premium VPS Management System
-# =========================================
+# ==========================================
+# VPS Management Menu - Xray & SSL
+# ==========================================
+
+# Initialize with error handling
+set -euo pipefail
 
 # Color definitions
-R='\033[0;31m'
-G='\033[0;32m'
-Y='\033[0;33m'
-B='\033[0;34m'
-P='\033[0;35m'
-C='\033[0;36m'
-W='\033[1;37m'
-NC='\033[0m'
-
-# Box characters
-BL='┌' BR='┐' TL='└' TR='┘' H='─' V='│' LT='├' RT='┤' TT='┬' BT='┴' X='┼'
+red='\e[1;31m'
+green='\e[0;32m'
+yellow='\e[1;33m'
+blue='\e[1;34m'
+white='\e[1;37m'
+cyan='\e[1;36m'
+nc='\e[0m'
 
 # Function to get IP with fallbacks
 get_ip() {
@@ -27,26 +25,27 @@ get_ip() {
 
 # Function to get domain safely
 get_domain() {
-    if [[ -f "/usr/local/etc/xray/domain" ]]; then
+    if [[ -f "/usr/local/etc/xray/domain" ]] && [[ -r "/usr/local/etc/xray/domain" ]]; then
         domain=$(cat /usr/local/etc/xray/domain 2>/dev/null | head -n1)
-    elif [[ -f "/root/domain" ]]; then
+    elif [[ -f "/root/domain" ]] && [[ -r "/root/domain" ]]; then
         domain=$(cat /root/domain 2>/dev/null | head -n1)
     else
-        domain="Not Set"
+        domain="Not Configured"
     fi
     echo "$domain"
 }
 
-# Check certificate status
+# Function to check certificate status
 check_cert_status() {
     local domain=$1
     local cert_file="$HOME/.acme.sh/${domain}_ecc/${domain}.key"
     
     if [[ ! -f "$cert_file" ]]; then
-        echo "${R}Not Found${NC}"
+        echo "Not Found"
         return
     fi
     
+    # More reliable certificate check
     if modifyTime=$(stat -c %y "$cert_file" 2>/dev/null); then
         modifyTime1=$(date +%s -d "$modifyTime")
         currentTime=$(date +%s)
@@ -54,107 +53,114 @@ check_cert_status() {
         days=$((stampDiff / 86400))
         remainingDays=$((90 - days))
         
-        if [[ $remainingDays -le 7 ]]; then
-            echo "${R}${remainingDays} days${NC}"
-        elif [[ $remainingDays -le 30 ]]; then
-            echo "${Y}${remainingDays} days${NC}"
+        if [[ $remainingDays -le 0 ]]; then
+            echo "expired"
         else
-            echo "${G}${remainingDays} days${NC}"
+            echo "${remainingDays} days"
         fi
     else
-        echo "${Y}Unknown${NC}"
+        echo "Unknown"
     fi
 }
 
-# Service status indicator
-svc_status() {
-    if systemctl is-active --quiet "$1" 2>/dev/null; then
-        echo -e "${G}●${NC}"
-    else
-        echo -e "${R}○${NC}"
-    fi
+# Function to get CPU usage accurately
+get_cpu_usage() {
+    cpu_usage=$(top -bn1 | grep "Cpu(s)" | awk '{print 100 - $8"%"}')
+    echo "$cpu_usage"
 }
 
-# Display header
+# Function to display header
 display_header() {
     clear
+    # Get all system information
     MYIP=$(get_ip)
     domain=$(get_domain)
     tlsStatus=$(check_cert_status "$domain")
-    uptime=$(uptime -p | sed 's/up //')
-    DATE=$(date '+%a, %d %b %Y %H:%M:%S')
+    country=$(cat /myinfo/country 2>/dev/null || echo "API limit..." 2>/dev/null)
+    uptime=$(uptime -p | cut -d " " -f 2-10)
+    DATE2=$(date -R | cut -d " " -f -5)
+    cpu_usage=$(get_cpu_usage)
     
-    # Memory info
+    # Memory information
     tram=$(free -m | awk 'NR==2 {print $2}')
     uram=$(free -m | awk 'NR==2 {print $3}')
     fram=$(free -m | awk 'NR==2 {print $4}')
-    ram_pct=$((uram * 100 / tram))
     
-    # OS info
-    os_info=$(hostnamectl | grep "Operating System" | cut -d ' ' -f5- | cut -c1-25)
+    # OS information
+    os_info=$(hostnamectl | grep "Operating System" | cut -d ' ' -f5-)
     
-    # CPU usage
-    cpu=$(top -bn1 | grep "Cpu(s)" | awk '{printf "%.1f%%", 100 - $8}')
-    
-    echo -e "${C}╔══════════════════════════════════════════════════════╗${NC}"
-    echo -e "${C}║${NC}              ${Y}★ JAY TUNNELING ★${NC}                      ${C}║${NC}"
-    echo -e "${C}║${NC}          ${W}Premium VPS Management${NC}                     ${C}║${NC}"
-    echo -e "${C}╠══════════════════════════════════════════════════════╣${NC}"
-    echo -e "${C}║${NC}  ${W}OS${NC}      : ${G}${os_info}${NC}"
-    echo -e "${C}║${NC}  ${W}IP${NC}      : ${G}${MYIP}${NC}"
-    echo -e "${C}║${NC}  ${W}Domain${NC}  : ${G}${domain}${NC}"
-    echo -e "${C}║${NC}  ${W}SSL${NC}     : ${tlsStatus}"
-    echo -e "${C}║${NC}  ${W}Uptime${NC}  : ${G}${uptime:0:20}${NC}"
-    echo -e "${C}╠══════════════════════════════════════════════════════╣${NC}"
-    echo -e "${C}║${NC}  ${W}RAM${NC}     : ${G}${uram}MB${NC} / ${tram}MB (${Y}${ram_pct}%${NC})"
-    echo -e "${C}║${NC}  ${W}CPU${NC}     : ${G}${cpu}${NC}"
-    echo -e "${C}║${NC}  ${W}Time${NC}    : ${G}${DATE}${NC}"
-    echo -e "${C}╠══════════════════════════════════════════════════════╣${NC}"
-    echo -e "${C}║${NC}  SSH:$(svc_status ssh) ${V} DROP:$(svc_status dropbear) ${V} NGINX:$(svc_status nginx) ${V} XRAY:$(svc_status xray)"
-    echo -e "${C}╚══════════════════════════════════════════════════════╝${NC}"
+    echo -e "${red}=========================================${nc}"
+    echo -e "${blue}                      VPS INFO                    ${nc}"
+    echo -e "${red}=========================================${nc}"
+    echo -e "${white} OS            ${nc}: $os_info"
+    echo -e "${white} Uptime        ${nc}: $uptime"
+    echo -e "${white} IP            ${nc}: $MYIP"
+    echo -e "${white} Country       ${nc}: $country"
+    echo -e "${white} DOMAIN        ${nc}: $domain"
+    echo -e "${white} TLS Status    ${nc}: $tlsStatus"
+    echo -e "${white} CPU Usage     ${nc}: $cpu_usage"
+    echo -e "${white} DATE & TIME   ${nc}: $DATE2"
+    echo -e "${red}=========================================${nc}"
+    echo -e "${blue}                      RAM INFO                    ${nc}"
+    echo -e "${red}=========================================${nc}"
+    echo -e ""
+    echo -e "${white} RAM USED     ${nc}: $uram MB"
+    echo -e "${white} RAM FREE     ${nc}: $fram MB"	
+    echo -e "${white} RAM TOTAL    ${nc}: $tram MB"
+    echo -e "${white} USAGE        ${nc}: $((uram * 100 / tram))%"
+    echo -e ""
 }
 
-# Display menu
+# Function to display menu
 display_menu() {
-    echo ""
-    echo -e "  ${Y}┌────────────── PROTOKOL ──────────────┐${NC}"
-    echo -e "  ${Y}│${NC}  ${W}1${NC} ${H}${H} SSH & OpenVPN                    ${Y}│${NC}"
-    echo -e "  ${Y}│${NC}  ${W}2${NC} ${H}${H} Vmess                            ${Y}│${NC}"
-    echo -e "  ${Y}│${NC}  ${W}3${NC} ${H}${H} Vless                            ${Y}│${NC}"
-    echo -e "  ${Y}│${NC}  ${W}4${NC} ${H}${H} Trojan                           ${Y}│${NC}"
-    echo -e "  ${Y}│${NC}  ${W}5${NC} ${H}${H} Shadowsocks                      ${Y}│${NC}"
-    echo -e "  ${Y}└───────────────────────────────────────┘${NC}"
-    echo ""
-    echo -e "  ${B}┌────────────── SYSTEM ────────────────┐${NC}"
-    echo -e "  ${B}│${NC}  ${W}6${NC} ${H}${H} Settings & Domain               ${B}│${NC}"
-    echo -e "  ${B}│${NC}  ${W}7${NC} ${H}${H} TOR Browser                     ${B}│${NC}"
-    echo -e "  ${B}│${NC}  ${W}8${NC} ${H}${H} Xray Log                        ${B}│${NC}"
-    echo -e "  ${B}│${NC}  ${W}9${NC} ${H}${H} Service Status                  ${B}│${NC}"
-    echo -e "  ${B}└───────────────────────────────────────┘${NC}"
-    echo ""
-    echo -e "  ${P}┌────────────── TOOLS ─────────────────┐${NC}"
-    echo -e "  ${P}│${NC}  ${W}10${NC} ${H} Clear RAM Cache                  ${P}│${NC}"
-    echo -e "  ${P}│${NC}  ${W}11${NC} ${H} Reboot VPS                       ${P}│${NC}"
-    echo -e "  ${P}│${NC}  ${R}x${NC}  ${H} Exit                             ${P}│${NC}"
-    echo -e "  ${P}└───────────────────────────────────────┘${NC}"
-    echo ""
+    echo -e "${red}=========================================${nc}"
+    echo -e "${blue}                       MENU                       ${nc}"
+    echo -e "${red}=========================================${nc}"
+    echo -e ""
+    echo -e "${white} 1 ${nc}  : Menu SSH VPN"
+    echo -e "${white} 2 ${nc}  : Menu Vmess"
+    echo -e "${white} 3 ${nc}  : Menu Vless"
+    echo -e "${white} 4 ${nc}  : Menu Trojan"
+    echo -e "${white} 5 ${nc}  : Menu Shadowsocks"
+    echo -e "${white} 6 ${nc}  : Menu Setting"
+    echo -e "${white} 7 ${nc}  : Menu TOR"
+    echo -e "${white} 8 ${nc}  : Xray Log"
+    echo -e "${white} 9 ${nc}  : Status Service"
+    echo -e "${white} 10 ${nc} : Clear RAM Cache"
+    echo -e "${white} 11 ${nc} : Reboot VPS"
+    echo -e "${white} x ${nc}  : Exit Script"
+    echo -e ""
+    echo -e "${red}=========================================${nc}"
+    echo -e "${white} Client Name ${nc}: Premium User"
+    echo -e "${white} Expired     ${nc}: "
+    echo -e "${red}=========================================${nc}"
+    echo -e "${blue}         JAY TUNNELING ${nc}"
+    echo -e "${red}=========================================${nc}"
+    echo -e ""
 }
 
-# Clear RAM cache
+# Function to clear RAM cache safely
 clear_ram_cache() {
-    echo -e "${Y}Clearing RAM cache...${NC}"
+    echo -e "${yellow}Clearing RAM cache...${nc}"
     sync
     echo 3 > /proc/sys/vm/drop_caches
-    sleep 1
-    echo -e "${G}✓ RAM cache cleared!${NC}"
+    sleep 2
+    echo -e "${green}RAM cache cleared successfully!${nc}"
     sleep 2
 }
 
-# Safe reboot
+# Function to reboot system safely
 safe_reboot() {
-    echo -e "${Y}Rebooting in 3 seconds...${NC}"
+    echo -e "${yellow}Rebooting system...${nc}"
+    echo -e "${yellow}Please wait...${nc}"
     sleep 3
     /sbin/reboot
+}
+
+# Function to handle invalid input
+handle_invalid_input() {
+    echo -e "${red}Invalid option! Please select a valid menu option.${nc}"
+    sleep 2
 }
 
 # Main menu function
@@ -163,7 +169,7 @@ main_menu() {
         display_header
         display_menu
         
-        read -p "  Select [1-11 or x]: " opt
+        read -p " Select menu [1-11, x]: " opt
         
         case $opt in
             1) clear ; m-sshovpn ;;
@@ -178,21 +184,52 @@ main_menu() {
             10) clear ; clear_ram_cache ;;
             11) clear ; safe_reboot ;;
             x|X) 
-                echo -e "${G}Goodbye!${NC}"
+                echo -e "${green}Goodbye! To restart the menu use: menu${nc}"
                 exit 0 
                 ;;
             *) 
-                echo -e "${R}Invalid option!${NC}"
-                sleep 1
+                handle_invalid_input 
                 ;;
         esac
         
+        # After executing any command (except exit), ask to continue
         if [[ $opt != "x" ]] && [[ $opt != "X" ]]; then
             echo ""
-            read -p "  Press Enter to continue..."
+            read -p "Press Enter to return to main menu..."
         fi
     done
 }
 
+# Check if required commands are available
+check_dependencies() {
+    local missing_deps=()
+    
+    for cmd in wget curl; do
+        if ! command -v "$cmd" &> /dev/null; then
+            missing_deps+=("$cmd")
+        fi
+    done
+    
+    if [[ ${#missing_deps[@]} -gt 0 ]]; then
+        echo -e "${red}Missing dependencies: ${missing_deps[*]}${nc}"
+        echo -e "${yellow}Please install them first.${nc}"
+        exit 1
+    fi
+}
+
 # Main execution
-main_menu
+main() {
+    # Check dependencies
+    check_dependencies
+    
+    # Trap Ctrl+C for graceful exit
+    trap 'echo -e "\n${yellow}Interrupted. Use Ctrl+D or type exit to quit properly.${nc}"; sleep 1' SIGINT
+    
+    # Start main menu
+    main_menu
+}
+
+# Run main function if script is executed directly
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+    main "$@"
+fi

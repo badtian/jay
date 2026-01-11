@@ -1,32 +1,48 @@
 #!/bin/bash
-# JAY TUNNELING - Shadowsocks Menu
+# =========================================
+# SHADOWSOCKS MENU
+# =========================================
 
-R='\033[0;31m' G='\033[0;32m' Y='\033[0;33m' B='\033[0;34m' C='\033[0;36m' W='\033[1;37m' NC='\033[0m'
+# ---------- Warna ----------
+red='\e[1;31m'
+green='\e[0;32m'
+yellow='\e[1;33m'
+blue='\e[1;34m'
+white='\e[1;37m'
+nc='\e[0m'
 
-show_menu() {
-    clear
-    echo -e "${C}╔══════════════════════════════════════════════════════╗${NC}"
-    echo -e "${C}║${NC}          ${Y}★ SHADOWSOCKS MENU ★${NC}                       ${C}║${NC}"
-    echo -e "${C}╠══════════════════════════════════════════════════════╣${NC}"
-    echo -e "${C}║${NC}  ${G}┌─── ACCOUNT MANAGEMENT ──────────────────────────┐${NC}  ${C}║${NC}"
-    echo -e "${C}║${NC}  ${G}│${NC}  ${W}1${NC}  ➜  Create Shadowsocks Account              ${G}│${NC}  ${C}║${NC}"
-    echo -e "${C}║${NC}  ${G}│${NC}  ${W}2${NC}  ➜  Trial Shadowsocks Account               ${G}│${NC}  ${C}║${NC}"
-    echo -e "${C}║${NC}  ${G}│${NC}  ${W}3${NC}  ➜  Renew Shadowsocks Account               ${G}│${NC}  ${C}║${NC}"
-    echo -e "${C}║${NC}  ${G}│${NC}  ${W}4${NC}  ➜  Delete Shadowsocks Account              ${G}│${NC}  ${C}║${NC}"
-    echo -e "${C}║${NC}  ${G}│${NC}  ${W}5${NC}  ➜  Check User Login                        ${G}│${NC}  ${C}║${NC}"
-    echo -e "${C}║${NC}  ${G}└──────────────────────────────────────────────────┘${NC}  ${C}║${NC}"
-    echo -e "${C}║${NC}  ${R}│${NC}  ${W}0${NC}  ➜  Back to Main Menu                       ${R}│${NC}  ${C}║${NC}"
-    echo -e "${C}╚══════════════════════════════════════════════════════╝${NC}"
-    echo ""
-}
+clear
+# ---------- Tampilan Menu ----------
+echo -e "${red}=========================================${nc}"
+echo -e "${blue}        Shadowsocks Account Menu          ${nc}"
+echo -e "${red}=========================================${nc}"
+echo -e ""
+echo -e " ${white}1${nc}) Create Shadowsocks Account"
+echo -e " ${white}2${nc}) Create Trial Shadowsocks"
+echo -e " ${white}3${nc}) Extend Shadowsocks Account"
+echo -e " ${white}4${nc}) Delete Shadowsocks Account"
+echo -e " ${white}5${nc}) Check Shadowsocks Account"
+echo -e " ${white}6${nc}) View Created Shadowsocks Log"
+echo -e ""
+echo -e "${red}=========================================${nc}"
+echo -e " ${white}0${nc}) Back to Menu"
+echo -e " Press ${yellow}x${nc} or Ctrl+C to Exit"
+echo -e "${red}=========================================${nc}"
+echo -e ""
 
-while true; do
-    show_menu
-    read -p "  Select [0-5]: " opt
-    case $opt in
-        1) clear ; add-ssws ;; 2) clear ; trial-ssws ;; 3) clear ; renew-ssws ;;
-        4) clear ; del-ssws ;; 5) clear ; cek-ssws ;; 0) break ;;
-        *) echo -e "${R}Invalid!${NC}"; sleep 1 ;;
-    esac
-    [[ $opt != "0" ]] && read -p "  Press Enter..."
-done
+# ---------- Input ----------
+read -rp " Select menu : " opt
+echo -e ""
+
+# ---------- Eksekusi ----------
+case $opt in
+  1) clear; add-ssws ;;
+  2) clear; trial-ssws ;;
+  3) clear; renew-ssws ;;
+  4) clear; del-ssws ;;
+  5) clear; cek-ssws ;;
+  6) clear; cat /var/log/create-shadowsocks.log ;;
+  0) clear; menu ;;
+  x|X) exit ;;
+  *) echo -e "${red}You pressed it wrong!${nc}"; sleep 1; m-ssws ;;
+esac
