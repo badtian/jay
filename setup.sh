@@ -93,53 +93,43 @@ elif [[ $dom -eq 2 ]]; then
     echo "$domen" | tee /usr/local/etc/xray/domain /root/domain >/dev/null
 
     echo -e "\n${yellow}Checking DNS record for ${domen}...${nc}"
-    DNS_IP=$(dig +short A "$domen" @1.1.1.1 | head -n1)
+    
+    # Try multiple DNS resolution methods (fallback if dig not available)
+    if command -v dig &>/dev/null; then
+        DNS_IP=$(dig +short A "$domen" @1.1.1.1 2>/dev/null | head -n1)
+    elif command -v host &>/dev/null; then
+        DNS_IP=$(host "$domen" 2>/dev/null | grep "has address" | head -1 | awk '{print $NF}')
+    elif command -v nslookup &>/dev/null; then
+        DNS_IP=$(nslookup "$domen" 2>/dev/null | grep -A1 "Name:" | grep "Address" | awk '{print $2}')
+    else
+        # Last resort: use getent
+        DNS_IP=$(getent hosts "$domen" 2>/dev/null | awk '{print $1}')
+    fi
 
     if [[ -z "$DNS_IP" ]]; then
         echo -e "${red}No DNS record found for ${domen}.${nc}"
-    elif [[ "$DNS_IP" != "$MYIP" ]]; then
+        echo -e "${yellow}Please make sure domain is pointing to this VPS: ${MYIP}${nc}"
+        echo -e "${yellow}Continuing anyway...${nc}"
+        sleep 2
+    elif [[ "$DNS_IP" == "$MYIP" ]]; then
+        echo -e "${green}✅ Domain already points to this VPS!${nc}"
+        echo -e "${green}   Domain: ${domen}${nc}"
+        echo -e "${green}   IP: ${MYIP}${nc}"
+        echo -e "${green}Continuing installation...${nc}"
+        sleep 2
+    else
         echo -e "${yellow}⚠ Domain does not point to this VPS.${nc}"
         echo -e "Your VPS IP: ${green}$MYIP${nc}"
-        echo -e "Current DNS IP: ${red}$DNS_IP${nc}"
-    else
-        echo -e "${green}✅ Domain already points to this VPS.${nc}"
-    fi
-
-    # If not pointing, offer Cloudflare API creation
-    if [[ "$DNS_IP" != "$MYIP" ]]; then
-        echo -e "\n${yellow}Would you like to create an A record on Cloudflare using API Token?${nc}"
-        read -rp "Create record automatically? (y/n): " ans
-        if [[ "$ans" == "y" || "$ans" == "Y" ]]; then
-            read -rp "Enter your Cloudflare API Token: " CF_API
-            read -rp "Enter your Cloudflare Zone Name / Primary Domain Name (e.g. example.com): " CF_ZONE
-            ZONE_ID=$(curl -s -X GET "https://api.cloudflare.com/client/v4/zones?name=${CF_ZONE}" \
-                -H "Authorization: Bearer ${CF_API}" \
-                -H "Content-Type: application/json" | jq -r '.result[0].id')
-
-            if [[ -z "$ZONE_ID" || "$ZONE_ID" == "null" ]]; then
-                echo -e "${red}Failed to get Zone ID. Please check your token and zone name.${nc}"
-            else
-                echo -e "${green}Zone ID found: ${ZONE_ID}${nc}"
-                # Create or update DNS record
-                RECORD_ID=$(curl -s -X GET "https://api.cloudflare.com/client/v4/zones/${ZONE_ID}/dns_records?name=${domen}" \
-                    -H "Authorization: Bearer ${CF_API}" \
-                    -H "Content-Type: application/json" | jq -r '.result[0].id')
-
-                if [[ "$RECORD_ID" == "null" || -z "$RECORD_ID" ]]; then
-                    echo -e "${yellow}Creating new A record for ${domen}...${nc}"
-                    curl -s -X POST "https://api.cloudflare.com/client/v4/zones/${ZONE_ID}/dns_records" \
-                        -H "Authorization: Bearer ${CF_API}" \
-                        -H "Content-Type: application/json" \
-                        --data "{\"type\":\"A\",\"name\":\"${domen}\",\"content\":\"${MYIP}\",\"ttl\":120,\"proxied\":false}" >/dev/null
-                else
-                    echo -e "${yellow}Updating existing A record for ${domen}...${nc}"
-                    curl -s -X PUT "https://api.cloudflare.com/client/v4/zones/${ZONE_ID}/dns_records/${RECORD_ID}" \
-                        -H "Authorization: Bearer ${CF_API}" \
-                        -H "Content-Type: application/json" \
-                        --data "{\"type\":\"A\",\"name\":\"${domen}\",\"content\":\"${MYIP}\",\"ttl\":120,\"proxied\":false}" >/dev/null
-                fi
-                echo -e "${green}✅ DNS record set to ${MYIP}${nc}"
-            fi
+        echo -e "Domain points to: ${red}$DNS_IP${nc}"
+        echo -e ""
+        echo -e "${yellow}Options:${nc}"
+        echo -e "  1. Point domain manually in Cloudflare/DNS panel"
+        echo -e "  2. Continue anyway (SSL may fail)"
+        echo -e ""
+        read -rp "Continue installation? (y/n): " ans
+        if [[ "$ans" != "y" && "$ans" != "Y" ]]; then
+            echo -e "${red}Installation cancelled.${nc}"
+            exit 1
         fi
     fi
 else 
