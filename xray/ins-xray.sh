@@ -586,31 +586,31 @@ systemctl start nginx
 
 cd /usr/bin
 # vless
-wget -O add-vless "https://raw.githubusercontent.com/givps/AutoScriptXray/master/xray/add-vless.sh" && chmod +x add-vless
-wget -O trial-vless "https://raw.githubusercontent.com/givps/AutoScriptXray/master/xray/trial-vless.sh" && chmod +x trial-vless
-wget -O renew-vless "https://raw.githubusercontent.com/givps/AutoScriptXray/master/xray/renew-vless.sh" && chmod +x renew-vless
-wget -O del-vless "https://raw.githubusercontent.com/givps/AutoScriptXray/master/xray/del-vless.sh" && chmod +x del-vless
-wget -O cek-vless "https://raw.githubusercontent.com/givps/AutoScriptXray/master/xray/cek-vless.sh" && chmod +x cek-vless
+wget -O add-vless "https://raw.githubusercontent.com/badtian/jay/main/xray/add-vless.sh" && chmod +x add-vless
+wget -O trial-vless "https://raw.githubusercontent.com/badtian/jay/main/xray/trial-vless.sh" && chmod +x trial-vless
+wget -O renew-vless "https://raw.githubusercontent.com/badtian/jay/main/xray/renew-vless.sh" && chmod +x renew-vless
+wget -O del-vless "https://raw.githubusercontent.com/badtian/jay/main/xray/del-vless.sh" && chmod +x del-vless
+wget -O cek-vless "https://raw.githubusercontent.com/badtian/jay/main/xray/cek-vless.sh" && chmod +x cek-vless
 # vmess
-wget -O add-ws "https://raw.githubusercontent.com/givps/AutoScriptXray/master/xray/add-ws.sh" && chmod +x add-ws
-wget -O trial-vmess "https://raw.githubusercontent.com/givps/AutoScriptXray/master/xray/trial-vmess.sh" && chmod +x trial-vmess
-wget -O renew-ws "https://raw.githubusercontent.com/givps/AutoScriptXray/master/xray/renew-ws.sh" && chmod +x renew-ws
-wget -O del-ws "https://raw.githubusercontent.com/givps/AutoScriptXray/master/xray/del-ws.sh" && chmod +x del-ws
-wget -O cek-ws "https://raw.githubusercontent.com/givps/AutoScriptXray/master/xray/cek-ws.sh" && chmod +x cek-ws
+wget -O add-ws "https://raw.githubusercontent.com/badtian/jay/main/xray/add-ws.sh" && chmod +x add-ws
+wget -O trial-vmess "https://raw.githubusercontent.com/badtian/jay/main/xray/trial-vmess.sh" && chmod +x trial-vmess
+wget -O renew-ws "https://raw.githubusercontent.com/badtian/jay/main/xray/renew-ws.sh" && chmod +x renew-ws
+wget -O del-ws "https://raw.githubusercontent.com/badtian/jay/main/xray/del-ws.sh" && chmod +x del-ws
+wget -O cek-ws "https://raw.githubusercontent.com/badtian/jay/main/xray/cek-ws.sh" && chmod +x cek-ws
 
 # trojan
-wget -O add-tr "https://raw.githubusercontent.com/givps/AutoScriptXray/master/xray/add-tr.sh" && chmod +x add-tr
-wget -O trial-trojan "https://raw.githubusercontent.com/givps/AutoScriptXray/master/xray/trial-trojan.sh" && chmod +x trial-trojan
-wget -O renew-tr "https://raw.githubusercontent.com/givps/AutoScriptXray/master/xray/renew-tr.sh" && chmod +x renew-tr
-wget -O del-tr "https://raw.githubusercontent.com/givps/AutoScriptXray/master/xray/del-tr.sh" && chmod +x del-tr
-wget -O cek-tr "https://raw.githubusercontent.com/givps/AutoScriptXray/master/xray/cek-tr.sh" && chmod +x cek-tr
+wget -O add-tr "https://raw.githubusercontent.com/badtian/jay/main/xray/add-tr.sh" && chmod +x add-tr
+wget -O trial-trojan "https://raw.githubusercontent.com/badtian/jay/main/xray/trial-trojan.sh" && chmod +x trial-trojan
+wget -O renew-tr "https://raw.githubusercontent.com/badtian/jay/main/xray/renew-tr.sh" && chmod +x renew-tr
+wget -O del-tr "https://raw.githubusercontent.com/badtian/jay/main/xray/del-tr.sh" && chmod +x del-tr
+wget -O cek-tr "https://raw.githubusercontent.com/badtian/jay/main/xray/cek-tr.sh" && chmod +x cek-tr
 
 # shadowsocks
-wget -O add-ssws "https://raw.githubusercontent.com/givps/AutoScriptXray/master/xray/add-ssws.sh" && chmod +x add-ssws
-wget -O trial-ssws "https://raw.githubusercontent.com/givps/AutoScriptXray/master/xray/trial-ssws.sh" && chmod +x trial-ssws
-wget -O renew-ssws "https://raw.githubusercontent.com/givps/AutoScriptXray/master/xray/renew-ssws.sh" && chmod +x renew-ssws
-wget -O del-ssws "https://raw.githubusercontent.com/givps/AutoScriptXray/master/xray/del-ssws.sh" && chmod +x del-ssws
-wget -O cek-ssws "https://raw.githubusercontent.com/givps/AutoScriptXray/master/xray/cek-ssws.sh" && chmod +x cek-ssws
+wget -O add-ssws "https://raw.githubusercontent.com/badtian/jay/main/xray/add-ssws.sh" && chmod +x add-ssws
+wget -O trial-ssws "https://raw.githubusercontent.com/badtian/jay/main/xray/trial-ssws.sh" && chmod +x trial-ssws
+wget -O renew-ssws "https://raw.githubusercontent.com/badtian/jay/main/xray/renew-ssws.sh" && chmod +x renew-ssws
+wget -O del-ssws "https://raw.githubusercontent.com/badtian/jay/main/xray/del-ssws.sh" && chmod +x del-ssws
+wget -O cek-ssws "https://raw.githubusercontent.com/badtian/jay/main/xray/cek-ssws.sh" && chmod +x cek-ssws
 
 # xray acces & error log
-wget -O xray-log "https://raw.githubusercontent.com/givps/AutoScriptXray/master/xray/xray-log.sh" && chmod +x xray-log
+wget -O xray-log "https://raw.githubusercontent.com/badtian/jay/main/xray/xray-log.sh" && chmod +x xray-log

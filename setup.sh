@@ -95,7 +95,7 @@ read -rp "Choose Your Domain Installation 1/2 : " dom
 if [[ $dom -eq 1 ]]; then
     clear
     rm -f /root/cf.sh
-    wget -q -O /root/cf.sh "https://raw.githubusercontent.com/givps/AutoScriptXray/master/ssh/cf.sh"
+    wget -q -O /root/cf.sh "https://raw.githubusercontent.com/badtian/jay/main/ssh/cf.sh"
     chmod +x /root/cf.sh && bash /root/cf.sh
 
 elif [[ $dom -eq 2 ]]; then
@@ -153,19 +153,19 @@ echo -e "${red}=========================================${nc}"
 echo -e "${blue}       Install SSH VPN           ${nc}"
 echo -e "${red}=========================================${nc}"
 #install ssh vpn
-wget https://raw.githubusercontent.com/givps/AutoScriptXray/master/ssh/ssh-vpn.sh && chmod +x ssh-vpn.sh && ./ssh-vpn.sh
+wget https://raw.githubusercontent.com/badtian/jay/main/ssh/ssh-vpn.sh && chmod +x ssh-vpn.sh && ./ssh-vpn.sh
 
 echo -e "${red}=========================================${nc}"
 echo -e "${blue}          Install XRAY              ${nc}"
 echo -e "${red}=========================================${nc}"
 #Instal Xray
-wget https://raw.githubusercontent.com/givps/AutoScriptXray/master/xray/ins-xray.sh && chmod +x ins-xray.sh && ./ins-xray.sh
+wget https://raw.githubusercontent.com/badtian/jay/main/xray/ins-xray.sh && chmod +x ins-xray.sh && ./ins-xray.sh
 
 echo -e "${red}=========================================${nc}"
 echo -e "${blue}      Install SSH Websocket           ${nc}"
 echo -e "${red}=========================================${nc}"
 # install sshws
-# wget https://raw.githubusercontent.com/givps/AutoScriptXray/master/ws/install-ws.sh && chmod +x install-ws.sh && ./install-ws.sh
+# wget https://raw.githubusercontent.com/badtian/jay/main/ws/install-ws.sh && chmod +x install-ws.sh && ./install-ws.sh
 
 # ==========================================
 # INSTALL WEBSOCKET PROXY.JS
@@ -211,7 +211,7 @@ fi
 # -------------------------------
 echo "[STEP 3] Downloading proxy.js..."
 rm -f /usr/local/bin/proxy.js
-wget -q -O /usr/local/bin/proxy.js https://raw.githubusercontent.com/givps/AutoScriptXray/master/ws-stunnel/proxy.js
+wget -q -O /usr/local/bin/proxy.js https://raw.githubusercontent.com/badtian/jay/main/ws-stunnel/proxy.js
 chmod +x /usr/local/bin/proxy.js
 echo "[STEP 3] proxy.js installed at /usr/local/bin/proxy.js"
 
@@ -220,7 +220,7 @@ echo "[STEP 3] proxy.js installed at /usr/local/bin/proxy.js"
 # -------------------------------
 echo "[STEP 4] Setting up ws-proxy systemd service..."
 rm -f /etc/systemd/system/ws-proxy.service
-wget -q -O /etc/systemd/system/ws-proxy.service https://raw.githubusercontent.com/givps/AutoScriptXray/master/ws-stunnel/ws-proxy.service
+wget -q -O /etc/systemd/system/ws-proxy.service https://raw.githubusercontent.com/badtian/jay/main/ws-stunnel/ws-proxy.service
 chmod 644 /etc/systemd/system/ws-proxy.service
 
 cd /usr/local/bin
@@ -255,25 +255,25 @@ echo "========================================="
 #echo -e "${blue}             Install SlowDNS            ${nc}"
 #echo -e "${red}=========================================${nc}"
 # install slowdns
-# wget https://raw.githubusercontent.com/givps/AutoScriptXray/master/slowdns/slowdns.sh && chmod +x slowdns.sh && ./slowdns.sh
+# wget https://raw.githubusercontent.com/badtian/jay/main/slowdns/slowdns.sh && chmod +x slowdns.sh && ./slowdns.sh
 
 #echo -e "${red}=========================================${nc}"
 #echo -e "${blue}               Install Tor              ${nc}"
 #echo -e "${red}=========================================${nc}"
 # install tor
-#wget https://raw.githubusercontent.com/givps/AutoScriptXray/master/ssh/tor.sh && chmod +x tor.sh && ./tor.sh
+#wget https://raw.githubusercontent.com/badtian/jay/main/ssh/tor.sh && chmod +x tor.sh && ./tor.sh
 
 #echo -e "${red}=========================================${nc}"
 #echo -e "${blue}           Install UDP CUSTOM           ${nc}"
 #echo -e "${red}=========================================${nc}"
 # install udp-custom
-# wget https://raw.githubusercontent.com/givps/AutoScriptXray/master/udp-custom/udp-custom.sh && chmod +x udp-custom.sh && ./udp-custom.sh
+# wget https://raw.githubusercontent.com/badtian/jay/main/udp-custom/udp-custom.sh && chmod +x udp-custom.sh && ./udp-custom.sh
 
 echo -e "${red}=========================================${nc}"
 echo -e "${blue}           Install OpenVPN              ${nc}"
 echo -e "${red}=========================================${nc}"
 # install tor openvpn
-wget https://raw.githubusercontent.com/givps/AutoScriptXray/master/openvpn/openvpn.sh && chmod +x openvpn.sh && ./openvpn.sh
+wget https://raw.githubusercontent.com/badtian/jay/main/openvpn/openvpn.sh && chmod +x openvpn.sh && ./openvpn.sh
 
 cat > /root/.profile <<'EOF'
 # ~/.profile: executed by Bourne-compatible login shells.

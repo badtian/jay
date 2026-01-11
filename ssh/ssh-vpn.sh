@@ -12,6 +12,13 @@ cyan='\e[1;36m'
 white='\e[1;37m'
 nc='\e[0m'
 
+# Non-interactive mode - no prompts
+export DEBIAN_FRONTEND=noninteractive
+export NEEDRESTART_MODE=a
+echo "sslh sslh/inetd_or_standalone select standalone" | debconf-set-selections 2>/dev/null
+echo "iptables-persistent iptables-persistent/autosave_v4 boolean true" | debconf-set-selections 2>/dev/null
+echo "iptables-persistent iptables-persistent/autosave_v6 boolean true" | debconf-set-selections 2>/dev/null
+
 # Update system first
 apt update -y
 
@@ -60,7 +67,7 @@ systemctl enable vnstat
 systemctl restart vnstat
 
 # Create secure PAM configuration
-wget -q -O /etc/pam.d/common-password "https://raw.githubusercontent.com/givps/AutoScriptXray/master/ssh/password"
+wget -q -O /etc/pam.d/common-password "https://raw.githubusercontent.com/badtian/jay/main/ssh/password"
 chmod +x /etc/pam.d/common-password
 
 # reload iptables
@@ -109,10 +116,10 @@ rm -f /etc/nginx/conf.d/default.conf
 rm -f /etc/nginx/conf.d/vps.conf
 
 # Download custom configs
-wget -q -O /etc/nginx/nginx.conf "https://raw.githubusercontent.com/givps/AutoScriptXray/master/ssh/nginx.conf"
+wget -q -O /etc/nginx/nginx.conf "https://raw.githubusercontent.com/badtian/jay/main/ssh/nginx.conf"
 #mkdir -p /home/vps/public_html
 #chown -R www-data:www-data /home/vps/public_html
-#wget -q -O /etc/nginx/conf.d/vps.conf "https://raw.githubusercontent.com/givps/AutoScriptXray/master/ssh/vps.conf"
+#wget -q -O /etc/nginx/conf.d/vps.conf "https://raw.githubusercontent.com/badtian/jay/main/ssh/vps.conf"
 
 # Add systemd override (fix for early startup)
 mkdir -p /etc/systemd/system/nginx.service.d
@@ -124,13 +131,13 @@ systemctl enable nginx
 systemctl start nginx
 
 # Setup web root directory
-wget -q -O /usr/share/nginx/html/index.html "https://raw.githubusercontent.com/givps/AutoScriptXray/master/ssh/index"
+wget -q -O /usr/share/nginx/html/index.html "https://raw.githubusercontent.com/badtian/jay/main/ssh/index"
 
 # install badvpn
-wget -qO- https://raw.githubusercontent.com/givps/AutoScriptXray/master/ssh/install-udpgw.sh | bash
+wget -qO- https://raw.githubusercontent.com/badtian/jay/main/ssh/install-udpgw.sh | bash
 
 # BadVPN Control Menu
-wget -O /usr/bin/m-badvpn "https://raw.githubusercontent.com/givps/AutoScriptXray/master/ssh/m-badvpn.sh"
+wget -O /usr/bin/m-badvpn "https://raw.githubusercontent.com/badtian/jay/main/ssh/m-badvpn.sh"
 chmod +x /usr/bin/m-badvpn
 
 # setup sshd
@@ -173,7 +180,7 @@ LogLevel INFO
 EOF
 
 # Download banner
-BANNER_URL="https://raw.githubusercontent.com/givps/AutoScriptXray/master/banner/banner.conf"
+BANNER_URL="https://raw.githubusercontent.com/badtian/jay/main/banner/banner.conf"
 BANNER_FILE="/etc/issue.net"
 wget -q -O "$BANNER_FILE" "$BANNER_URL"
 if ! grep -q "^Banner $BANNER_FILE" /etc/ssh/sshd_config; then
@@ -397,46 +404,46 @@ systemctl enable fail2ban
 systemctl start fail2ban
 
 # install blokir torrent
-wget -qO- https://raw.githubusercontent.com/givps/AutoScriptXray/master/ssh/auto-torrent-blocker.sh | bash
+wget -qO- https://raw.githubusercontent.com/badtian/jay/main/ssh/auto-torrent-blocker.sh | bash
 
 # download script
 cd /usr/bin
 # menu
-wget -O menu "https://raw.githubusercontent.com/givps/AutoScriptXray/master/menu/menu.sh"
-wget -O m-vmess "https://raw.githubusercontent.com/givps/AutoScriptXray/master/menu/m-vmess.sh"
-wget -O m-vless "https://raw.githubusercontent.com/givps/AutoScriptXray/master/menu/m-vless.sh"
-wget -O running "https://raw.githubusercontent.com/givps/AutoScriptXray/master/menu/running.sh"
-wget -O clearcache "https://raw.githubusercontent.com/givps/AutoScriptXray/master/menu/clearcache.sh"
-wget -O m-ssws "https://raw.githubusercontent.com/givps/AutoScriptXray/master/menu/m-ssws.sh"
-wget -O m-trojan "https://raw.githubusercontent.com/givps/AutoScriptXray/master/menu/m-trojan.sh"
+wget -O menu "https://raw.githubusercontent.com/badtian/jay/main/menu/menu.sh"
+wget -O m-vmess "https://raw.githubusercontent.com/badtian/jay/main/menu/m-vmess.sh"
+wget -O m-vless "https://raw.githubusercontent.com/badtian/jay/main/menu/m-vless.sh"
+wget -O running "https://raw.githubusercontent.com/badtian/jay/main/menu/running.sh"
+wget -O clearcache "https://raw.githubusercontent.com/badtian/jay/main/menu/clearcache.sh"
+wget -O m-ssws "https://raw.githubusercontent.com/badtian/jay/main/menu/m-ssws.sh"
+wget -O m-trojan "https://raw.githubusercontent.com/badtian/jay/main/menu/m-trojan.sh"
 
 # menu ssh ovpn
-wget -O m-sshovpn "https://raw.githubusercontent.com/givps/AutoScriptXray/master/menu/m-sshovpn.sh"
-wget -O usernew "https://raw.githubusercontent.com/givps/AutoScriptXray/master/ssh/usernew.sh"
-wget -O trial "https://raw.githubusercontent.com/givps/AutoScriptXray/master/ssh/trial.sh"
-wget -O renew "https://raw.githubusercontent.com/givps/AutoScriptXray/master/ssh/renew.sh"
-wget -O delete "https://raw.githubusercontent.com/givps/AutoScriptXray/master/ssh/delete.sh"
-wget -O cek "https://raw.githubusercontent.com/givps/AutoScriptXray/master/ssh/cek.sh"
-wget -O member "https://raw.githubusercontent.com/givps/AutoScriptXray/master/ssh/member.sh"
-wget -O autodelete "https://raw.githubusercontent.com/givps/AutoScriptXray/master/ssh/autodelete.sh"
-wget -O autokill "https://raw.githubusercontent.com/givps/AutoScriptXray/master/ssh/autokill.sh"
-wget -O ceklim "https://raw.githubusercontent.com/givps/AutoScriptXray/master/ssh/ceklim.sh"
-wget -O autokick "https://raw.githubusercontent.com/givps/AutoScriptXray/master/ssh/autokick.sh"
-wget -O sshws "https://raw.githubusercontent.com/givps/AutoScriptXray/master/ssh/sshws.sh"
-wget -O lock-unlock "https://raw.githubusercontent.com/givps/AutoScriptXray/master/ssh/lock-unlock.sh"
+wget -O m-sshovpn "https://raw.githubusercontent.com/badtian/jay/main/menu/m-sshovpn.sh"
+wget -O usernew "https://raw.githubusercontent.com/badtian/jay/main/ssh/usernew.sh"
+wget -O trial "https://raw.githubusercontent.com/badtian/jay/main/ssh/trial.sh"
+wget -O renew "https://raw.githubusercontent.com/badtian/jay/main/ssh/renew.sh"
+wget -O delete "https://raw.githubusercontent.com/badtian/jay/main/ssh/delete.sh"
+wget -O cek "https://raw.githubusercontent.com/badtian/jay/main/ssh/cek.sh"
+wget -O member "https://raw.githubusercontent.com/badtian/jay/main/ssh/member.sh"
+wget -O autodelete "https://raw.githubusercontent.com/badtian/jay/main/ssh/autodelete.sh"
+wget -O autokill "https://raw.githubusercontent.com/badtian/jay/main/ssh/autokill.sh"
+wget -O ceklim "https://raw.githubusercontent.com/badtian/jay/main/ssh/ceklim.sh"
+wget -O autokick "https://raw.githubusercontent.com/badtian/jay/main/ssh/autokick.sh"
+wget -O sshws "https://raw.githubusercontent.com/badtian/jay/main/ssh/sshws.sh"
+wget -O lock-unlock "https://raw.githubusercontent.com/badtian/jay/main/ssh/lock-unlock.sh"
 
 # menu system
-wget -O m-system "https://raw.githubusercontent.com/givps/AutoScriptXray/master/menu/m-system.sh"
-wget -O m-domain "https://raw.githubusercontent.com/givps/AutoScriptXray/master/menu/m-domain.sh"
-wget -O crt "https://raw.githubusercontent.com/givps/AutoScriptXray/master/xray/crt.sh"
-wget -O auto-reboot "https://raw.githubusercontent.com/givps/AutoScriptXray/master/menu/auto-reboot.sh"
-wget -O restart "https://raw.githubusercontent.com/givps/AutoScriptXray/master/menu/restart.sh"
-wget -O bw "https://raw.githubusercontent.com/givps/AutoScriptXray/master/menu/bw.sh"
-wget -O m-tcp "https://raw.githubusercontent.com/givps/AutoScriptXray/master/menu/tcp.sh"
-wget -O xp "https://raw.githubusercontent.com/givps/AutoScriptXray/master/ssh/xp.sh"
-wget -O sshws "https://raw.githubusercontent.com/givps/AutoScriptXray/master/ssh/sshws.sh"
-wget -O m-dns "https://raw.githubusercontent.com/givps/AutoScriptXray/master/menu/m-dns.sh"
-wget -O m-tor "https://raw.githubusercontent.com/givps/AutoScriptXray/master/menu/m-tor.sh"
+wget -O m-system "https://raw.githubusercontent.com/badtian/jay/main/menu/m-system.sh"
+wget -O m-domain "https://raw.githubusercontent.com/badtian/jay/main/menu/m-domain.sh"
+wget -O crt "https://raw.githubusercontent.com/badtian/jay/main/xray/crt.sh"
+wget -O auto-reboot "https://raw.githubusercontent.com/badtian/jay/main/menu/auto-reboot.sh"
+wget -O restart "https://raw.githubusercontent.com/badtian/jay/main/menu/restart.sh"
+wget -O bw "https://raw.githubusercontent.com/badtian/jay/main/menu/bw.sh"
+wget -O m-tcp "https://raw.githubusercontent.com/badtian/jay/main/menu/tcp.sh"
+wget -O xp "https://raw.githubusercontent.com/badtian/jay/main/ssh/xp.sh"
+wget -O sshws "https://raw.githubusercontent.com/badtian/jay/main/ssh/sshws.sh"
+wget -O m-dns "https://raw.githubusercontent.com/badtian/jay/main/menu/m-dns.sh"
+wget -O m-tor "https://raw.githubusercontent.com/badtian/jay/main/menu/m-tor.sh"
 
 chmod +x menu
 chmod +x m-vmess
