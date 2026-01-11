@@ -35,6 +35,17 @@ else
 fi
 
 # -------------------------------
+# Set Non-Interactive Mode (No prompts)
+# -------------------------------
+export DEBIAN_FRONTEND=noninteractive
+export NEEDRESTART_MODE=a
+
+# Pre-configure package prompts
+echo "iptables-persistent iptables-persistent/autosave_v4 boolean true" | debconf-set-selections
+echo "iptables-persistent iptables-persistent/autosave_v6 boolean true" | debconf-set-selections
+echo "sslh sslh/inetd_or_standalone select standalone" | debconf-set-selections
+
+# -------------------------------
 # 1️⃣ Set timezone ke Asia/Jakarta
 # -------------------------------
 echo "Setting timezone to Asia/Jakarta..."
